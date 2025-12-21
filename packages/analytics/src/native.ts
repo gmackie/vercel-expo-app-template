@@ -1,5 +1,5 @@
 import PostHog from "posthog-react-native";
-import type { AnalyticsEvent } from "./events.js";
+import type { AnalyticsEvent } from "./events";
 
 type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 type Properties = Record<string, JsonValue>;

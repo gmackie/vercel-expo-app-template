@@ -9,18 +9,30 @@ export const metadata: Metadata = {
   description: "Next.js + Expo Monorepo",
 };
 
+function Providers({ children }: { children: ReactNode }) {
+  // Clerk requires keys at build time for static pages
+  // Wrap conditionally to allow builds without keys
+  if (!process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY) {
+    return <TRPCProvider>{children}</TRPCProvider>;
+  }
+
+  return (
+    <ClerkProvider>
+      <TRPCProvider>{children}</TRPCProvider>
+    </ClerkProvider>
+  );
+}
+
 export default function RootLayout({
   children,
 }: {
   children: ReactNode;
 }) {
   return (
-    <ClerkProvider>
-      <html lang="en">
-        <body>
-          <TRPCProvider>{children}</TRPCProvider>
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en">
+      <body>
+        <Providers>{children}</Providers>
+      </body>
+    </html>
   );
 }

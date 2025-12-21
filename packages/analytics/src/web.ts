@@ -1,5 +1,5 @@
 import posthog from "posthog-js";
-import type { AnalyticsEvent, EventProperties } from "./events.js";
+import type { AnalyticsEvent, EventProperties } from "./events";
 
 let initialized = false;
 

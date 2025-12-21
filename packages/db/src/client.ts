@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import type { Database } from "./types.js";
+import type { Database } from "./types";
 
 function getEnvVar(name: string): string {
   const value = process.env[name];
