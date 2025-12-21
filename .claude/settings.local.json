@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(superpowers:brainstorming)",
+      "Bash(mkdir:*)",
+      "Skill(superpowers:executing-plans)",
+      "Skill(superpowers:writing-plans)",
+      "Skill(superpowers:subagent-driven-development)",
+      "Bash(git rev-parse:*)",
+      "Bash(git -C /Volumes/dev/vercel-app status)",
+      "Bash(pnpm install)",
+      "Bash(npm --version:*)",
+      "Bash(npm install:*)",
+      "Bash(pnpm turbo:*)",
+      "Bash(git -C /Volumes/dev/vercel-app diff /Volumes/dev/vercel-app/package.json)",
+      "Bash(git -C /Volumes/dev/vercel-app add package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json)",
+      "Bash(git -C /Volumes/dev/vercel-app commit -m \"$\\(cat <<''EOF''\nchore: initialize pnpm workspace with turborepo\nEOF\n\\)\")",
+      "Bash(git -C /Volumes/dev/vercel-app log --oneline)",
+      "Bash(cat:*)",
+      "Bash(git -C /Volumes/dev/vercel-app log --oneline -1 c326881)",
+      "Bash(git -C /Volumes/dev/vercel-app show c326881 --stat)",
+      "Bash(test:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}
