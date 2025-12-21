@@ -24,7 +24,12 @@
       "Bash(git commit:*)",
       "Bash(tree:*)",
       "Bash(pnpm list:*)",
-      "Bash(pnpm --filter @repo/shared typecheck:*)"
+      "Bash(pnpm --filter @repo/shared typecheck:*)",
+      "Bash(pnpm --filter @repo/db typecheck:*)",
+      "Bash(pnpm --filter @repo/db lint:*)",
+      "Bash(ls:*)",
+      "Bash(pnpm --filter @repo/shared lint:*)",
+      "Bash(pnpm eslint:*)"
     ]
   }
 }
