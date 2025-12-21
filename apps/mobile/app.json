@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "name": "Vercel App",
+    "slug": "vercel-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "vercel-app",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.vercelapp.mobile"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.vercelapp.mobile"
+    }
+  }
+}
