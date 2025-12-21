@@ -21,7 +21,8 @@
       "Bash(git -C /Volumes/dev/vercel-app show c326881 --stat)",
       "Bash(test:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(tree:*)"
     ]
   }
 }
