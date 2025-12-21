@@ -33,7 +33,9 @@
       "Bash(pnpm --filter @repo/api typecheck:*)",
       "Bash(npx tsc:*)",
       "Bash(pnpm install:*)",
-      "Bash(pnpm --filter @repo/web build:*)"
+      "Bash(pnpm --filter @repo/web build:*)",
+      "Bash(printf:*)",
+      "Bash(pnpm --filter @repo/web typecheck:*)"
     ]
   }
 }
