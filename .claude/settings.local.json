@@ -29,7 +29,10 @@
       "Bash(pnpm --filter @repo/db lint:*)",
       "Bash(ls:*)",
       "Bash(pnpm --filter @repo/shared lint:*)",
-      "Bash(pnpm eslint:*)"
+      "Bash(pnpm eslint:*)",
+      "Bash(pnpm --filter @repo/api typecheck:*)",
+      "Bash(npx tsc:*)",
+      "Bash(pnpm install:*)"
     ]
   }
 }
