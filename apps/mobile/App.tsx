@@ -1,13 +1,25 @@
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
+import { AuthProvider } from "./src/lib/auth";
+import { TRPCProvider } from "./src/lib/trpc";
 
-export default function App() {
+function HomeScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Vercel App</Text>
       <Text style={styles.subtitle}>Expo + tRPC</Text>
       <StatusBar style="auto" />
     </View>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <TRPCProvider>
+        <HomeScreen />
+      </TRPCProvider>
+    </AuthProvider>
   );
 }
 
