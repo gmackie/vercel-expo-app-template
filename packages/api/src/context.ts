@@ -1,10 +1,9 @@
-import { createSupabaseServiceClient } from "@repo/db/client";
-import type { SupabaseClient } from "@repo/db/client";
+import { createDb, type Database } from "@repo/db";
 import { verifyToken } from "@clerk/backend";
 
 export interface Context {
   userId: string | null;
-  db: SupabaseClient;
+  db: Database;
 }
 
 interface CreateContextOptions {
@@ -21,7 +20,7 @@ export async function createContext({
   req,
   clerkUserId,
 }: CreateContextOptions): Promise<Context> {
-  const db = createSupabaseServiceClient();
+  const db = createDb();
   let userId = clerkUserId ?? null;
 
   // If no userId from cookie auth (Next.js), try Bearer token (Expo)

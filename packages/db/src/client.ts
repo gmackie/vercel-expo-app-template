@@ -1,5 +1,6 @@
-import { createClient } from "@supabase/supabase-js";
-import type { Database } from "./types";
+import { createClient } from "@libsql/client/web";
+import { drizzle } from "drizzle-orm/libsql";
+import * as schema from "./schema";
 
 function getEnvVar(name: string): string {
   const value = process.env[name];
@@ -9,24 +10,13 @@ function getEnvVar(name: string): string {
   return value;
 }
 
-export function createSupabaseClient() {
-  return createClient<Database>(
-    getEnvVar("NEXT_PUBLIC_SUPABASE_URL"),
-    getEnvVar("NEXT_PUBLIC_SUPABASE_ANON_KEY")
-  );
+export function createDb() {
+  const client = createClient({
+    url: getEnvVar("TURSO_SQLITE_URL"),
+    authToken: getEnvVar("TURSO_AUTH_TOKEN"),
+  });
+
+  return drizzle(client, { schema });
 }
 
-export function createSupabaseServiceClient() {
-  return createClient<Database>(
-    getEnvVar("NEXT_PUBLIC_SUPABASE_URL"),
-    getEnvVar("SUPABASE_SERVICE_ROLE_KEY"),
-    {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
-      },
-    }
-  );
-}
-
-export type SupabaseClient = ReturnType<typeof createSupabaseClient>;
+export type Database = ReturnType<typeof createDb>;
