@@ -9,13 +9,19 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.vercelapp.mobile"
+      "bundleIdentifier": "io.gmac.apps.demo"
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#ffffff"
       },
-      "package": "com.vercelapp.mobile"
+      "package": "io.gmac.apps.demo"
+    },
+    "owner": "gmacko",
+    "extra": {
+      "eas": {
+        "projectId": "41a1032d-927a-455c-a60d-945cd305974b"
+      }
     }
   }
 }
