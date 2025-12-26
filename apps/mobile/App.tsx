@@ -6,8 +6,8 @@ import { TRPCProvider } from "./src/lib/trpc";
 function HomeScreen() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Vercel App</Text>
-      <Text style={styles.subtitle}>Expo + tRPC</Text>
+      <Text style={styles.title}>My App</Text>
+      <Text style={styles.subtitle}>Built with Expo + tRPC</Text>
       <StatusBar style="auto" />
     </View>
   );

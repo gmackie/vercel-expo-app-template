@@ -1,26 +1,25 @@
 {
   "expo": {
-    "name": "Vercel App",
-    "slug": "vercel-app",
+    "name": "My App",
+    "slug": "my-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "scheme": "vercel-app",
+    "scheme": "my-app",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "io.gmac.apps.demo"
+      "bundleIdentifier": "com.example.myapp"
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#ffffff"
       },
-      "package": "io.gmac.apps.demo"
+      "package": "com.example.myapp"
     },
-    "owner": "gmacko",
     "extra": {
       "eas": {
-        "projectId": "41a1032d-927a-455c-a60d-945cd305974b"
+        "projectId": "your-eas-project-id"
       }
     }
   }

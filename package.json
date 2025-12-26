@@ -5,9 +5,18 @@
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
+    "dev:web": "turbo dev --filter=*web*",
+    "dev:mobile": "./scripts/dev-mobile.sh",
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
-    "clean": "turbo clean && rm -rf node_modules"
+    "clean": "turbo clean && rm -rf node_modules",
+    "setup": "./scripts/setup.sh",
+    "provision": "./scripts/provision.sh",
+    "db:push": "pnpm --filter '*db*' db:push",
+    "db:studio": "pnpm --filter '*db*' db:studio",
+    "eas:dev": "cd apps/mobile && eas build --profile development",
+    "eas:preview": "cd apps/mobile && eas build --profile preview",
+    "eas:prod": "cd apps/mobile && eas build --profile production"
   },
   "devDependencies": {
     "turbo": "^2.3.3"

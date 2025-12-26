@@ -1,5 +1,5 @@
-import { createClient } from "@libsql/client/web";
-import { drizzle } from "drizzle-orm/libsql";
+import { neon } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/neon-http";
 import * as schema from "./schema";
 
 function getEnvVar(name: string): string {
@@ -11,12 +11,8 @@ function getEnvVar(name: string): string {
 }
 
 export function createDb() {
-  const client = createClient({
-    url: getEnvVar("TURSO_SQLITE_URL"),
-    authToken: getEnvVar("TURSO_AUTH_TOKEN"),
-  });
-
-  return drizzle(client, { schema });
+  const sql = neon(getEnvVar("DATABASE_URL"));
+  return drizzle(sql, { schema });
 }
 
 export type Database = ReturnType<typeof createDb>;

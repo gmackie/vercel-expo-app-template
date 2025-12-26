@@ -19,10 +19,11 @@
     "lint": "eslint \"src/**/*.ts\"",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "db:generate": "drizzle-kit generate"
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate"
   },
   "dependencies": {
-    "@libsql/client": "^0.14.0",
+    "@neondatabase/serverless": "^0.10.4",
     "drizzle-orm": "^0.38.3"
   },
   "devDependencies": {

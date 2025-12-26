@@ -1,15 +1,16 @@
-import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
-export const users = sqliteTable("users", {
-  id: text("id").primaryKey(),
+export const users = pgTable("users", {
+  id: uuid("id").primaryKey().defaultRandom(),
   email: text("email").notNull(),
   clerkId: text("clerk_id").notNull().unique(),
-  createdAt: integer("created_at", { mode: "timestamp" })
+  createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
-    .$defaultFn(() => new Date()),
-  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
-    .$defaultFn(() => new Date()),
+    .defaultNow()
+    .$onUpdate(() => new Date()),
 });
 
 export type User = typeof users.$inferSelect;

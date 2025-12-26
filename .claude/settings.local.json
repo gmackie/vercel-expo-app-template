@@ -36,7 +36,20 @@
       "Bash(pnpm --filter @repo/web build:*)",
       "Bash(printf:*)",
       "Bash(pnpm --filter @repo/web typecheck:*)",
-      "Bash(pnpm --filter @repo/mobile typecheck:*)"
+      "Bash(pnpm --filter @repo/mobile typecheck:*)",
+      "Bash(pnpm --filter @repo/analytics typecheck:*)",
+      "Bash(git rm:*)",
+      "Bash(vercel link:*)",
+      "Bash(vercel domains add:*)",
+      "Bash(vercel --prod:*)",
+      "Bash(vercel project:*)",
+      "Bash(vercel deploy:*)",
+      "Bash(vercel inspect:*)",
+      "Bash(eas project:init:*)",
+      "Bash(eas init:*)",
+      "Bash(eas whoami:*)",
+      "Bash(eas secret:create:*)",
+      "Bash(eas env:create:*)"
     ]
   }
 }

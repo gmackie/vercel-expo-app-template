@@ -5,8 +5,8 @@ import { TRPCProvider } from "@/lib/trpc/provider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Vercel App",
-  description: "Next.js + Expo Monorepo",
+  title: "My App",
+  description: "Built with Next.js + Expo",
 };
 
 function Providers({ children }: { children: React.ReactNode }) {
