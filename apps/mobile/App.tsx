@@ -1,7 +1,19 @@
+import * as Sentry from "@sentry/react-native";
 import { StatusBar } from "expo-status-bar";
 import { StyleSheet, Text, View } from "react-native";
 import { AuthProvider } from "./src/lib/auth";
 import { TRPCProvider } from "./src/lib/trpc";
+import { PostHogProvider } from "./src/lib/posthog";
+
+// Initialize Sentry before anything else
+Sentry.init({
+  dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
+  tracesSampleRate: 1.0,
+  enableAutoSessionTracking: true,
+  attachScreenshot: true,
+  attachViewHierarchy: true,
+  enabled: !!process.env.EXPO_PUBLIC_SENTRY_DSN,
+});
 
 function HomeScreen() {
   return (
@@ -13,15 +25,19 @@ function HomeScreen() {
   );
 }
 
-export default function App() {
+function App() {
   return (
     <AuthProvider>
-      <TRPCProvider>
-        <HomeScreen />
-      </TRPCProvider>
+      <PostHogProvider>
+        <TRPCProvider>
+          <HomeScreen />
+        </TRPCProvider>
+      </PostHogProvider>
     </AuthProvider>
   );
 }
+
+export default Sentry.wrap(App);
 
 const styles = StyleSheet.create({
   container: {

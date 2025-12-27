@@ -76,10 +76,13 @@ export default {
 
     plugins: [
       "expo-splash-screen",
-      // Add other plugins here as needed:
-      // "expo-camera",
-      // "expo-notifications",
-      // etc.
+      [
+        "@sentry/react-native/expo",
+        {
+          organization: process.env.SENTRY_ORG,
+          project: process.env.SENTRY_PROJECT,
+        },
+      ],
     ],
 
     extra: {
