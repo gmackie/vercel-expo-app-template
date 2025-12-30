@@ -4,6 +4,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { AuthProvider } from "./src/lib/auth";
 import { TRPCProvider } from "./src/lib/trpc";
 import { PostHogProvider } from "./src/lib/posthog";
+import { I18nProvider, useTranslations } from "@repo/i18n/native";
 
 // Initialize Sentry before anything else
 Sentry.init({
@@ -16,10 +17,12 @@ Sentry.init({
 });
 
 function HomeScreen() {
+  const t = useTranslations("home");
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>My App</Text>
-      <Text style={styles.subtitle}>Built with Expo + tRPC</Text>
+      <Text style={styles.title}>{t("title")}</Text>
+      <Text style={styles.subtitle}>{t("subtitle")}</Text>
       <StatusBar style="auto" />
     </View>
   );
@@ -30,7 +33,9 @@ function App() {
     <AuthProvider>
       <PostHogProvider>
         <TRPCProvider>
-          <HomeScreen />
+          <I18nProvider>
+            <HomeScreen />
+          </I18nProvider>
         </TRPCProvider>
       </PostHogProvider>
     </AuthProvider>
