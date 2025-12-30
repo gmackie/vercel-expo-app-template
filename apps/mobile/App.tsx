@@ -5,6 +5,7 @@ import { AuthProvider } from "./src/lib/auth";
 import { TRPCProvider } from "./src/lib/trpc";
 import { PostHogProvider } from "./src/lib/posthog";
 import { I18nProvider, useTranslations } from "@repo/i18n/native";
+import { StoreProvider } from "@repo/store/native";
 
 // Initialize Sentry before anything else
 Sentry.init({
@@ -34,7 +35,9 @@ function App() {
       <PostHogProvider>
         <TRPCProvider>
           <I18nProvider>
-            <HomeScreen />
+            <StoreProvider>
+              <HomeScreen />
+            </StoreProvider>
           </I18nProvider>
         </TRPCProvider>
       </PostHogProvider>
