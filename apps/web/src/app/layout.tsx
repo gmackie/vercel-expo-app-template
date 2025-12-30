@@ -5,6 +5,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { TRPCProvider } from "@/lib/trpc/provider";
 import { PostHogProvider } from "@/lib/posthog";
+import { StoreProvider } from "@repo/store/web";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -30,7 +31,9 @@ function Providers({ children }: { children: React.ReactNode }) {
     return (
       <PostHogProvider>
         <TRPCProvider>
-          <IntlProvider>{children}</IntlProvider>
+          <IntlProvider>
+            <StoreProvider>{children}</StoreProvider>
+          </IntlProvider>
         </TRPCProvider>
       </PostHogProvider>
     );
@@ -40,7 +43,9 @@ function Providers({ children }: { children: React.ReactNode }) {
     <ClerkProvider>
       <PostHogProvider>
         <TRPCProvider>
-          <IntlProvider>{children}</IntlProvider>
+          <IntlProvider>
+            <StoreProvider>{children}</StoreProvider>
+          </IntlProvider>
         </TRPCProvider>
       </PostHogProvider>
     </ClerkProvider>
