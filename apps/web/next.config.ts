@@ -1,8 +1,11 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
+import createNextIntlPlugin from "next-intl/plugin";
+
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@repo/api", "@repo/db", "@repo/shared"],
+  transpilePackages: ["@repo/api", "@repo/db", "@repo/shared", "@repo/i18n"],
   serverExternalPackages: ["@neondatabase/serverless"],
 };
 
@@ -38,7 +41,7 @@ const sentryConfig = {
 
 // Wrap with Sentry only if DSN is configured
 const exportedConfig = process.env.NEXT_PUBLIC_SENTRY_DSN
-  ? withSentryConfig(nextConfig, sentryConfig)
-  : nextConfig;
+  ? withSentryConfig(withNextIntl(nextConfig), sentryConfig)
+  : withNextIntl(nextConfig);
 
 export default exportedConfig;
