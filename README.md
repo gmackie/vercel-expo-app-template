@@ -16,6 +16,8 @@ A production-ready monorepo template for building full-stack applications with N
 | **Analytics** | PostHog |
 | **Monitoring** | Sentry |
 | **API** | tRPC |
+| **i18n** | next-intl (web), use-intl (mobile) |
+| **State** | Zustand |
 | **Styling** | Tailwind CSS |
 | **Package Manager** | pnpm + Turborepo |
 
@@ -78,7 +80,9 @@ pnpm dev
 │   ├── shared/              # Shared types, utils, validators
 │   ├── analytics/           # PostHog wrapper (web + native)
 │   ├── monitoring/          # Sentry wrapper (web + native)
-│   └── payments/            # Stripe wrapper
+│   ├── payments/            # Stripe wrapper
+│   ├── i18n/                # Internationalization (next-intl + use-intl)
+│   └── store/               # Zustand state management
 │
 ├── tooling/
 │   ├── eslint/              # Shared ESLint configs
