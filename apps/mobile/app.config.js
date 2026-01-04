@@ -50,12 +50,15 @@ export default {
 
     ios: {
       supportsTablet: true,
-      // Different bundle ID for dev allows side-by-side installation
       bundleIdentifier: IS_DEV ? `${BUNDLE_ID_BASE}.dev` : BUNDLE_ID_BASE,
       buildNumber: "1",
+      associatedDomains: [
+        `applinks:${process.env.EXPO_PUBLIC_APP_DOMAIN ?? "example.com"}`,
+      ],
       infoPlist: {
-        // Add any required permissions here
         ITSAppUsesNonExemptEncryption: false,
+        NSCameraUsageDescription: "This app uses the camera to take photos.",
+        NSPhotoLibraryUsageDescription: "This app accesses your photos to upload images.",
       },
     },
 
@@ -64,9 +67,22 @@ export default {
         foregroundImage: "./assets/adaptive-icon.png",
         backgroundColor: "#ffffff",
       },
-      // Different package name for dev allows side-by-side installation
       package: IS_DEV ? `${BUNDLE_ID_BASE}.dev` : BUNDLE_ID_BASE,
       versionCode: 1,
+      intentFilters: [
+        {
+          action: "VIEW",
+          autoVerify: true,
+          data: [
+            {
+              scheme: "https",
+              host: process.env.EXPO_PUBLIC_APP_DOMAIN ?? "example.com",
+              pathPrefix: "/app",
+            },
+          ],
+          category: ["BROWSABLE", "DEFAULT"],
+        },
+      ],
     },
 
     web: {
@@ -76,6 +92,20 @@ export default {
 
     plugins: [
       "expo-splash-screen",
+      [
+        "expo-image-picker",
+        {
+          photosPermission: "Allow $(PRODUCT_NAME) to access your photos.",
+          cameraPermission: "Allow $(PRODUCT_NAME) to access your camera.",
+        },
+      ],
+      [
+        "expo-notifications",
+        {
+          icon: "./assets/notification-icon.png",
+          color: "#ffffff",
+        },
+      ],
       [
         "@sentry/react-native/expo",
         {

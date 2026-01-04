@@ -1099,67 +1099,75 @@ git commit -m "feat(mobile): integrate zustand store provider with AsyncStorage"
 
 ---
 
-## Task 7: Create CLAUDE.md
+## Task 7: Create CLAUDE.md [x]
 
 **Files:**
 - Create: `CLAUDE.md`
 
 **Step 1: Create CLAUDE.md**
 
-```markdown
-# CLAUDE.md
+...
 
-> Instructions for Claude Code and AI assistants working on this codebase.
-
-## Project Overview
-
-This is a **production-ready monorepo template** for building full-stack applications with:
-- **Web**: Next.js 15 (App Router, React 19)
-- **Mobile**: Expo (React Native)
-- **Backend**: tRPC + Neon (Serverless PostgreSQL) + Drizzle ORM
-
-The template provides pre-configured integrations for auth, payments, analytics, monitoring, i18n, and state management.
-
-## Tech Stack
-
-| Category | Technology |
-|----------|------------|
-| Framework | Next.js 15 (React 19) |
-| Mobile | Expo 52 (React Native 0.76) |
-| Database | Neon + Drizzle ORM |
-| Auth | Clerk |
-| Payments | Stripe |
-| Analytics | PostHog |
-| Monitoring | Sentry |
-| API | tRPC + React Query |
-| i18n | next-intl (web), use-intl (mobile) |
-| State | Zustand |
-| Styling | Tailwind CSS |
-| Package Manager | pnpm + Turborepo |
-
-## Quick Start
+**Step 2: Commit**
 
 ```bash
-# Install dependencies
-pnpm install
+git add CLAUDE.md
+git commit -m "docs: add CLAUDE.md for AI assistant guidance"
+```
 
-# Start development (all apps)
-pnpm dev
+---
 
-# Start web only
-pnpm dev:web
+## Task 8: Create AGENTS.md [x]
 
-# Start mobile (requires ngrok)
-pnpm dev:mobile
+**Files:**
+- Create: `AGENTS.md`
 
-# Type check all packages
-pnpm typecheck
+**Step 1: Create AGENTS.md**
 
-# Lint all packages
-pnpm lint
+...
 
-# Build all packages
-pnpm build
+**Step 2: Commit**
+
+```bash
+git add AGENTS.md
+git commit -m "docs: add AGENTS.md for generic AI assistant guidance"
+```
+
+---
+
+## Task 9: Update README.md [x]
+
+**Files:**
+- Modify: `README.md`
+
+**Step 1: Update the Stack table in README.md**
+
+Add to the Stack table after "Styling":
+```markdown
+| **i18n** | next-intl (web), use-intl (mobile) |
+| **State** | Zustand |
+```
+
+**Step 2: Update Project Structure in README.md**
+
+Update packages section:
+```markdown
+├── packages/
+│   ├── api/                 # tRPC routers and procedures
+│   ├── db/                  # Drizzle schema and client
+│   ├── shared/              # Shared types, utils, validators
+│   ├── analytics/           # PostHog wrapper (web + native)
+│   ├── monitoring/          # Sentry wrapper (web + native)
+│   ├── payments/            # Stripe wrapper
+│   ├── i18n/                # Internationalization (next-intl + use-intl)
+│   └── store/               # Zustand state management
+```
+
+**Step 3: Commit**
+
+```bash
+git add README.md
+git commit -m "docs: update README with i18n and state management"
 ```
 
 ## Project Structure
@@ -1555,7 +1563,7 @@ git commit -m "chore: final cleanup"
 | 4 | Integrate i18n into mobile app |
 | 5 | Integrate store into web app |
 | 6 | Integrate store into mobile app |
-| 7 | Create CLAUDE.md |
-| 8 | Create AGENTS.md |
-| 9 | Update README.md |
-| 10 | Final verification |
+| 7 | Create CLAUDE.md | [x] |
+| 8 | Create AGENTS.md | [x] |
+| 9 | Update README.md | [x] |
+| 10 | Final verification | [x] |

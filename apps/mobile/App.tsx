@@ -1,11 +1,16 @@
+import "./global.css";
 import * as Sentry from "@sentry/react-native";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import { SafeAreaView, View } from "react-native";
+import { useState } from "react";
 import { AuthProvider } from "./src/lib/auth";
 import { TRPCProvider } from "./src/lib/trpc";
 import { PostHogProvider } from "./src/lib/posthog";
-import { I18nProvider, useTranslations } from "@repo/i18n/native";
+import { I18nProvider } from "@repo/i18n/native";
 import { StoreProvider } from "@repo/store/native";
+import { HomeScreen } from "./src/screens/HomeScreen";
+import { SettingsScreen } from "./src/screens/SettingsScreen";
+import { Button, ButtonText } from "@repo/ui-native";
 
 // Initialize Sentry before anything else
 Sentry.init({
@@ -17,26 +22,41 @@ Sentry.init({
   enabled: !!process.env.EXPO_PUBLIC_SENTRY_DSN,
 });
 
-function HomeScreen() {
-  const t = useTranslations("home");
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{t("title")}</Text>
-      <Text style={styles.subtitle}>{t("subtitle")}</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
-}
-
 function App() {
+  const [activeTab, setActiveTab] = useState<"home" | "settings">("home");
+
   return (
     <AuthProvider>
       <PostHogProvider>
         <TRPCProvider>
           <I18nProvider>
             <StoreProvider>
-              <HomeScreen />
+              <SafeAreaView className="flex-1 bg-white">
+                <View className="flex-1 bg-gray-50">
+                  {activeTab === "home" ? <HomeScreen /> : <SettingsScreen />}
+                </View>
+                <View className="flex-row border-t border-gray-200 bg-white p-2">
+                  <Button
+                    variant="ghost"
+                    className={`flex-1 ${activeTab === "home" ? "bg-gray-100" : ""}`}
+                    onPress={() => setActiveTab("home")}
+                  >
+                    <ButtonText className={activeTab === "home" ? "text-blue-600" : "text-gray-500"}>
+                      Home
+                    </ButtonText>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className={`flex-1 ${activeTab === "settings" ? "bg-gray-100" : ""}`}
+                    onPress={() => setActiveTab("settings")}
+                  >
+                    <ButtonText className={activeTab === "settings" ? "text-blue-600" : "text-gray-500"}>
+                      Settings
+                    </ButtonText>
+                  </Button>
+                </View>
+                <StatusBar style="auto" />
+              </SafeAreaView>
             </StoreProvider>
           </I18nProvider>
         </TRPCProvider>
@@ -46,21 +66,3 @@ function App() {
 }
 
 export default Sentry.wrap(App);
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "#666",
-  },
-});
