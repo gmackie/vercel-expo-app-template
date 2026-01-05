@@ -4,7 +4,11 @@
     "appVersionSource": "remote"
   },
   "build": {
+    "base": {
+      "node": "20.18.0"
+    },
     "development": {
+      "extends": "base",
       "developmentClient": true,
       "distribution": "internal",
       "env": {
@@ -20,6 +24,7 @@
       "channel": "development"
     },
     "simulator": {
+      "extends": "base",
       "developmentClient": true,
       "distribution": "internal",
       "env": {
@@ -31,6 +36,7 @@
       "channel": "development"
     },
     "preview": {
+      "extends": "base",
       "distribution": "internal",
       "env": {
         "APP_VARIANT": "development"
@@ -44,6 +50,7 @@
       "channel": "preview"
     },
     "production": {
+      "extends": "base",
       "autoIncrement": true,
       "env": {
         "APP_VARIANT": "production"

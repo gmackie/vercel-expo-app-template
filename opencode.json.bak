@@ -136,9 +136,6 @@
       "description": "Close a release and finalize documentation",
       "skill": "gmacko-release-close"
     }
-  },
-
-  "mcp": {
-    "servers": {}
   }
+
 }

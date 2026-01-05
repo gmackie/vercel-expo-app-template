@@ -1,28 +1,6 @@
 #!/bin/bash
-# =============================================================================
-# Mobile Development Script
-# =============================================================================
-# Starts the full mobile development environment with:
-# 1. Next.js API server
-# 2. ngrok tunnel for API (so mobile device can reach local API)
-# 3. Expo with tunnel mode
-#
-# Prerequisites:
-# - ngrok: brew install ngrok
-# - ngrok account: https://dashboard.ngrok.com (free tier works)
-# - jq: brew install jq
-#
-# Usage:
-#   ./scripts/dev-mobile.sh                    # Uses random ngrok URL
-#   ./scripts/dev-mobile.sh --domain myapp     # Uses myapp.ngrok.app (requires paid ngrok)
-#   ./scripts/dev-mobile.sh --expo-go          # Use Expo Go instead of dev client
-#   ./scripts/dev-mobile.sh --dev-client       # Build and use development client
-#
-# =============================================================================
-
 set -e
 
-# Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -30,20 +8,20 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
-info() { echo -e "${BLUE}ℹ${NC} $1"; }
-success() { echo -e "${GREEN}✓${NC} $1"; }
-warn() { echo -e "${YELLOW}⚠${NC} $1"; }
-error() { echo -e "${RED}✗${NC} $1"; exit 1; }
-step() { echo -e "${CYAN}→${NC} $1"; }
+info() { echo -e "${BLUE}i${NC} $1"; }
+success() { echo -e "${GREEN}+${NC} $1"; }
+warn() { echo -e "${YELLOW}!${NC} $1"; }
+error() { echo -e "${RED}x${NC} $1"; exit 1; }
+step() { echo -e "${CYAN}>${NC} $1"; }
 
-# Get app name from package.json
 APP_NAME=$(node -p "require('./package.json').name" 2>/dev/null || echo "app")
 SAFE_NAME=$(echo "$APP_NAME" | sed 's/@//g' | sed 's/\//-/g')
 
-# Parse arguments
 NGROK_DOMAIN=""
 USE_EXPO_GO=false
 BUILD_DEV_CLIENT=false
+USE_BETA=false
+BETA_URL=""
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -59,6 +37,15 @@ while [[ $# -gt 0 ]]; do
             BUILD_DEV_CLIENT=true
             shift
             ;;
+        --beta)
+            USE_BETA=true
+            if [[ -n "$2" && ! "$2" =~ ^-- ]]; then
+                BETA_URL="$2"
+                shift 2
+            else
+                shift
+            fi
+            ;;
         --help|-h)
             echo ""
             echo "Mobile Development Script"
@@ -66,10 +53,17 @@ while [[ $# -gt 0 ]]; do
             echo "Usage: ./scripts/dev-mobile.sh [options]"
             echo ""
             echo "Options:"
+            echo "  --beta [URL]      Use beta environment (default: beta.\${project}.gmac.io)"
+            echo "                    Skips local Next.js and ngrok, connects to remote API"
             echo "  --domain NAME     Use a static ngrok domain (NAME.ngrok.app)"
             echo "  --expo-go         Use Expo Go (limited native modules)"
             echo "  --dev-client      Build development client first"
             echo "  --help, -h        Show this help"
+            echo ""
+            echo "Examples:"
+            echo "  ./scripts/dev-mobile.sh                    # Local dev with ngrok tunnel"
+            echo "  ./scripts/dev-mobile.sh --beta             # Connect to beta.myapp.gmac.io"
+            echo "  ./scripts/dev-mobile.sh --beta https://custom.api.com"
             echo ""
             exit 0
             ;;
@@ -79,41 +73,75 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# Temp files for logs
 NEXT_LOG="/tmp/${SAFE_NAME}-next.log"
 NGROK_LOG="/tmp/${SAFE_NAME}-ngrok.log"
 
 echo ""
-echo "╔════════════════════════════════════════════════════════════════╗"
-echo "║              Mobile Development Environment                     ║"
-echo "╚════════════════════════════════════════════════════════════════╝"
+echo "Mobile Development Environment"
+echo "==============================="
 echo ""
 
-# =============================================================================
-# Prerequisites Check
-# =============================================================================
+if [[ "$USE_BETA" == true ]]; then
+    if [[ -z "$BETA_URL" ]]; then
+        PROJECT_NAME=$(echo "$SAFE_NAME" | sed 's/-app$//' | sed 's/vercel-//')
+        BETA_URL="https://beta.${PROJECT_NAME}.gmac.io"
+    fi
+    
+    step "Using beta environment: ${BETA_URL}"
+    
+    if ! curl -s --head --connect-timeout 5 "${BETA_URL}/api/health" >/dev/null 2>&1; then
+        warn "Beta API may not be reachable. Continuing anyway..."
+    else
+        success "Beta API is reachable"
+    fi
+    
+    API_URL="$BETA_URL"
+    
+    echo ""
+    echo "---"
+    echo -e "${GREEN}Beta environment ready!${NC}"
+    echo "---"
+    echo ""
+    echo -e "${BLUE}API:${NC}   ${API_URL}"
+    echo -e "${BLUE}tRPC:${NC} ${API_URL}/api/trpc"
+    echo ""
+    
+    step "Starting Expo..."
+    echo -e "EXPO_PUBLIC_API_URL=${API_URL}"
+    echo ""
+    
+    if [[ "$USE_EXPO_GO" == true ]]; then
+        info "Using Expo Go - some native modules may not work"
+        echo ""
+    fi
+    
+    echo -e "${YELLOW}Scan the QR code with your phone camera (iOS) or Expo Go app (Android)${NC}"
+    echo -e "${YELLOW}Press Ctrl+C to stop${NC}"
+    echo ""
+    
+    cd apps/mobile
+    if [[ "$USE_EXPO_GO" == true ]]; then
+        EXPO_PUBLIC_API_URL="$API_URL" npx expo start --tunnel --go
+    else
+        EXPO_PUBLIC_API_URL="$API_URL" npx expo start --tunnel
+    fi
+    exit 0
+fi
 
-# Check for ngrok
 if ! command -v ngrok &> /dev/null; then
     error "ngrok is not installed. Install with: brew install ngrok"
 fi
 
-# Check for jq
 if ! command -v jq &> /dev/null; then
     error "jq is not installed. Install with: brew install jq"
 fi
 
-# Check ngrok auth
 if ! ngrok config check &> /dev/null 2>&1; then
     warn "ngrok may not be authenticated"
     info "Get your auth token at: https://dashboard.ngrok.com/get-started/your-authtoken"
     info "Then run: ngrok authtoken YOUR_TOKEN"
     echo ""
 fi
-
-# =============================================================================
-# Cleanup Handler
-# =============================================================================
 
 NEXT_PID=""
 NGROK_PID=""
@@ -132,10 +160,6 @@ cleanup() {
 }
 
 trap cleanup SIGINT SIGTERM EXIT
-
-# =============================================================================
-# Build Development Client (if requested)
-# =============================================================================
 
 if [[ "$BUILD_DEV_CLIENT" == true ]]; then
     step "Building development client..."
@@ -161,20 +185,14 @@ if [[ "$BUILD_DEV_CLIENT" == true ]]; then
     echo ""
 fi
 
-# =============================================================================
-# Step 1: Start Next.js Server
-# =============================================================================
-
 step "Starting Next.js server..."
 > "$NEXT_LOG"
 
-# Find the web package filter
 WEB_FILTER=$(node -p "require('./package.json').name.replace(/^@/, '@').split('/')[0] + '/web'" 2>/dev/null || echo "web")
 
 pnpm --filter "*web*" dev > "$NEXT_LOG" 2>&1 &
 NEXT_PID=$!
 
-# Wait for Next.js to be ready
 NEXT_PORT=""
 for i in {1..60}; do
     NEXT_PORT=$(grep -oE 'Local:[[:space:]]*http://localhost:[0-9]+' "$NEXT_LOG" 2>/dev/null | grep -oE '[0-9]+$' | head -1)
@@ -190,33 +208,24 @@ fi
 
 success "Next.js running on port ${NEXT_PORT}"
 
-# =============================================================================
-# Step 2: Start ngrok Tunnel
-# =============================================================================
-
 step "Starting ngrok tunnel..."
 
 if [ -n "$NGROK_DOMAIN" ]; then
-    # Static domain (requires ngrok paid plan)
     NGROK_URL="https://${NGROK_DOMAIN}.ngrok.app"
     ngrok http "$NEXT_PORT" --url="$NGROK_URL" --log=stdout > "$NGROK_LOG" 2>&1 &
 else
-    # Random URL (free tier)
     ngrok http "$NEXT_PORT" --log=stdout --log-format=json > "$NGROK_LOG" 2>&1 &
 fi
 NGROK_PID=$!
 
-# Wait for tunnel to be ready
 API_URL=""
 for i in {1..30}; do
     if [ -n "$NGROK_DOMAIN" ]; then
-        # Check static domain
         if curl -s --head "https://${NGROK_DOMAIN}.ngrok.app" >/dev/null 2>&1; then
             API_URL="https://${NGROK_DOMAIN}.ngrok.app"
             break
         fi
     else
-        # Parse random URL from ngrok API
         API_URL=$(curl -s http://localhost:4040/api/tunnels 2>/dev/null | jq -r '.tunnels[0].public_url // empty' 2>/dev/null)
         if [ -n "$API_URL" ]; then
             break
@@ -231,14 +240,10 @@ fi
 
 success "API tunnel: ${API_URL}"
 
-# =============================================================================
-# Step 3: Start Expo
-# =============================================================================
-
 echo ""
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "---"
 echo -e "${GREEN}Development environment ready!${NC}"
-echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "---"
 echo ""
 echo -e "${BLUE}Web App:${NC}      http://localhost:${NEXT_PORT}"
 echo -e "${BLUE}API Tunnel:${NC}   ${API_URL}"
@@ -258,7 +263,6 @@ echo -e "${YELLOW}Scan the QR code with your phone camera (iOS) or Expo Go app (
 echo -e "${YELLOW}Press Ctrl+C to stop all servers${NC}"
 echo ""
 
-# Run Expo
 cd apps/mobile
 if [[ "$USE_EXPO_GO" == true ]]; then
     EXPO_PUBLIC_API_URL="$API_URL" npx expo start --tunnel --go
