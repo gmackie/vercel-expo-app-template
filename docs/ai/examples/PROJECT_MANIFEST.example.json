@@ -1,0 +1,226 @@
+{
+  "$schema": "../schemas/project-manifest.schema.json",
+  "version": "1.0.0",
+  "createdAt": "2025-01-05T00:00:00.000Z",
+  "updatedAt": "2025-01-05T00:00:00.000Z",
+  "project": {
+    "name": "acme-saas",
+    "displayName": "Acme SaaS Platform",
+    "description": "A B2B SaaS platform for project management and team collaboration",
+    "org": "gmacko",
+    "repository": "gmacko/acme-saas"
+  },
+  "goals": {
+    "primary": "Enable teams to manage projects, track tasks, and collaborate in real-time",
+    "targetUsers": "Small to medium B2B teams (5-50 users)",
+    "successMetrics": [
+      "User activation rate > 60%",
+      "Weekly active users retention > 40%",
+      "Task completion rate > 80%"
+    ],
+    "mvpScope": [
+      "User authentication and team management",
+      "Project CRUD with task lists",
+      "Real-time task status updates",
+      "Basic analytics dashboard"
+    ],
+    "outOfScope": [
+      "Mobile app (Phase 2)",
+      "Advanced reporting",
+      "Third-party integrations",
+      "Custom workflows"
+    ]
+  },
+  "platforms": {
+    "web": true,
+    "mobile": false,
+    "mobilePhase": 2
+  },
+  "integrations": {
+    "auth": {
+      "provider": "clerk",
+      "enabled": true,
+      "config": {
+        "socialProviders": ["google", "github"],
+        "mfa": false,
+        "organizations": true
+      }
+    },
+    "payments": {
+      "provider": "stripe",
+      "enabled": true,
+      "config": {
+        "model": "subscription",
+        "plans": ["free", "pro", "enterprise"],
+        "trialDays": 14
+      }
+    },
+    "analytics": {
+      "provider": "posthog",
+      "enabled": true,
+      "config": {
+        "autocapture": true,
+        "sessionRecording": true
+      }
+    },
+    "monitoring": {
+      "provider": "sentry",
+      "enabled": true,
+      "config": {
+        "performanceMonitoring": true,
+        "sampleRate": 0.1
+      }
+    },
+    "email": {
+      "provider": "sendgrid",
+      "enabled": false
+    },
+    "realtime": {
+      "provider": "pusher",
+      "enabled": true,
+      "config": {
+        "privateChannels": true
+      }
+    },
+    "storage": {
+      "provider": "uploadthing",
+      "enabled": false
+    }
+  },
+  "database": {
+    "provider": "neon",
+    "orm": "drizzle",
+    "entities": [
+      {
+        "name": "users",
+        "description": "User accounts linked to Clerk",
+        "fields": ["id", "clerkId", "email", "createdAt", "updatedAt"]
+      },
+      {
+        "name": "teams",
+        "description": "Organization/team containers",
+        "fields": ["id", "name", "slug", "ownerId", "createdAt"]
+      },
+      {
+        "name": "teamMembers",
+        "description": "Team membership with roles",
+        "fields": ["id", "teamId", "userId", "role", "joinedAt"]
+      },
+      {
+        "name": "projects",
+        "description": "Projects within teams",
+        "fields": ["id", "teamId", "name", "description", "status", "createdAt"]
+      },
+      {
+        "name": "tasks",
+        "description": "Tasks within projects",
+        "fields": ["id", "projectId", "title", "description", "status", "assigneeId", "dueDate", "createdAt"]
+      }
+    ],
+    "relationships": [
+      "users -> teamMembers (1:N)",
+      "teams -> teamMembers (1:N)",
+      "teams -> projects (1:N)",
+      "projects -> tasks (1:N)",
+      "users -> tasks (assignee, 1:N)"
+    ]
+  },
+  "api": {
+    "style": "trpc",
+    "realtime": true,
+    "routers": [
+      "users",
+      "teams",
+      "projects",
+      "tasks",
+      "billing"
+    ]
+  },
+  "screens": {
+    "mvp": [
+      {
+        "name": "Landing",
+        "path": "/",
+        "description": "Marketing landing page with pricing"
+      },
+      {
+        "name": "Sign In",
+        "path": "/sign-in",
+        "description": "Clerk-powered authentication"
+      },
+      {
+        "name": "Dashboard",
+        "path": "/dashboard",
+        "description": "Team overview with recent projects and tasks"
+      },
+      {
+        "name": "Projects List",
+        "path": "/projects",
+        "description": "All projects for the current team"
+      },
+      {
+        "name": "Project Detail",
+        "path": "/projects/[id]",
+        "description": "Project view with task board"
+      },
+      {
+        "name": "Settings",
+        "path": "/settings",
+        "description": "User and team settings"
+      },
+      {
+        "name": "Billing",
+        "path": "/settings/billing",
+        "description": "Stripe subscription management"
+      }
+    ],
+    "phase2": [
+      "Mobile: Home Tab",
+      "Mobile: Projects Tab",
+      "Mobile: Notifications Tab",
+      "Advanced Analytics"
+    ]
+  },
+  "deployment": {
+    "web": {
+      "provider": "vercel",
+      "team": "gmacko",
+      "environments": [
+        {
+          "name": "development",
+          "branch": "dev",
+          "domain": null
+        },
+        {
+          "name": "staging",
+          "branch": "staging",
+          "domain": "staging.acme-saas.com"
+        },
+        {
+          "name": "production",
+          "branch": "main",
+          "domain": "app.acme-saas.com"
+        }
+      ]
+    },
+    "mobile": {
+      "provider": "eas",
+      "profiles": ["development", "preview", "production"],
+      "bundleId": "com.gmacko.acmesaas"
+    }
+  },
+  "domains": {
+    "marketing": "acme-saas.com",
+    "app": "app.acme-saas.com",
+    "staging": "staging.acme-saas.com",
+    "api": "api.acme-saas.com"
+  },
+  "security": {
+    "sso": {
+      "enabled": true,
+      "provider": "gmacko.com (Entra ID)"
+    },
+    "dataResidency": "us",
+    "compliance": []
+  }
+}

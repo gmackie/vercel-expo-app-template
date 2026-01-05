@@ -1,0 +1,113 @@
+name: Feature Request
+description: Propose a new feature or enhancement
+title: "[Feature]: "
+labels: ["type:feature", "status:needs-triage"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a feature! Please fill out the sections below to help us understand your request.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: What problem does this feature solve? What's the user need?
+      placeholder: |
+        As a [type of user], I want [goal] so that [benefit].
+        
+        Currently, I have to [current workaround]...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe your proposed solution
+      placeholder: |
+        The feature should...
+        
+        User flow:
+        1. User navigates to...
+        2. User clicks...
+        3. System responds with...
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: How will we know this feature is complete?
+      placeholder: |
+        - [ ] User can...
+        - [ ] System displays...
+        - [ ] Data is saved...
+        - [ ] Analytics event tracked...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      description: Which platforms does this affect?
+      multiple: true
+      options:
+        - Web (Next.js)
+        - Mobile iOS (Expo)
+        - Mobile Android (Expo)
+        - API (tRPC)
+        - Database
+        - All platforms
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Suggested Priority
+      description: How important is this feature?
+      options:
+        - Critical (blocking users)
+        - High (significant impact)
+        - Medium (nice to have)
+        - Low (future consideration)
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: What alternative solutions have you considered?
+      placeholder: Describe alternatives you've thought of...
+
+  - type: textarea
+    id: mockups
+    attributes:
+      label: Mockups / Screenshots
+      description: Any visual references (drag and drop images)
+      placeholder: Drag and drop images here...
+
+  - type: input
+    id: plan-link
+    attributes:
+      label: Link to INITIAL_PLAN.md Section
+      description: If this relates to a planned feature, link to the relevant section
+      placeholder: "#screen-specifications"
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I have searched for existing feature requests
+          required: true
+        - label: I have included acceptance criteria
+          required: true
+        - label: This aligns with the project's MVP scope (or is marked as Phase 2+)
+          required: false
