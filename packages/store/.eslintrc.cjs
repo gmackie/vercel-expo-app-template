@@ -1,10 +1,4 @@
 module.exports = {
   root: true,
   extends: ["@repo/eslint-config/react.js"],
-  env: {
-    node: true,
-  },
-  globals: {
-    __DEV__: "readonly",
-  },
 };
