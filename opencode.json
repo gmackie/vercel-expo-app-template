@@ -1,0 +1,144 @@
+{
+  "$schema": "https://opencode.ai/schema/config.json",
+  "version": "1.0",
+  
+  "project": {
+    "name": "vercel-neon-expo-template",
+    "description": "Production-ready monorepo template for Gmacko Ventures"
+  },
+
+  "permission": {
+    "skill": {
+      "gmacko-init-interview": "allow",
+      "gmacko-init-plan": "allow",
+      "gmacko-init-bootstrap": "ask",
+      "gmacko-init-orchestrator": "ask",
+      "gmacko-dev-feature-plan": "allow",
+      "gmacko-dev-issue-create": "ask",
+      "gmacko-dev-pr-review": "allow",
+      "gmacko-qa-verify": "allow",
+      "gmacko-release-prepare": "allow",
+      "gmacko-release-deploy-web": "ask",
+      "gmacko-release-deploy-mobile": "ask",
+      "gmacko-release-close": "ask",
+      "*": "allow"
+    },
+    "tool": {
+      "bash": "allow",
+      "read": "allow",
+      "write": "allow",
+      "edit": "allow",
+      "glob": "allow",
+      "grep": "allow"
+    }
+  },
+
+  "agent": {
+    "build": {
+      "description": "Default development agent for implementing features",
+      "permission": {
+        "skill": {
+          "gmacko-release-*": "deny",
+          "*": "allow"
+        }
+      }
+    },
+    "plan": {
+      "description": "Planning agent for feature breakdown and architecture",
+      "permission": {
+        "skill": {
+          "gmacko-init-bootstrap": "deny",
+          "gmacko-release-deploy-*": "deny",
+          "*": "allow"
+        }
+      },
+      "tools": {
+        "write": false,
+        "edit": false
+      }
+    },
+    "qa": {
+      "description": "QA verification agent for testing and validation",
+      "permission": {
+        "skill": {
+          "gmacko-qa-verify": "allow",
+          "gmacko-dev-pr-review": "allow",
+          "gmacko-init-*": "deny",
+          "gmacko-release-deploy-*": "deny",
+          "*": "ask"
+        }
+      }
+    },
+    "release": {
+      "description": "Release management agent for deployments",
+      "permission": {
+        "skill": {
+          "gmacko-release-*": "allow",
+          "gmacko-qa-verify": "allow",
+          "gmacko-init-*": "deny",
+          "gmacko-dev-*": "deny"
+        }
+      }
+    }
+  },
+
+  "rules": [
+    "Always run `pnpm typecheck` and `pnpm lint` before completing tasks",
+    "Never commit secrets or .env files",
+    "Follow the provider hierarchy: Auth > Analytics > API > i18n > State",
+    "Use @repo/* imports for shared packages",
+    "Create handoff documents for all features",
+    "Require explicit confirmation for external side effects"
+  ],
+
+  "commands": {
+    "/init": {
+      "description": "Start project initialization workflow",
+      "skill": "gmacko-init-orchestrator"
+    },
+    "/interview": {
+      "description": "Run project interview to generate manifest",
+      "skill": "gmacko-init-interview"
+    },
+    "/plan": {
+      "description": "Generate implementation plan from manifest",
+      "skill": "gmacko-init-plan"
+    },
+    "/feature": {
+      "description": "Plan a new feature with task breakdown",
+      "skill": "gmacko-dev-feature-plan"
+    },
+    "/issue": {
+      "description": "Create a GitHub issue",
+      "skill": "gmacko-dev-issue-create"
+    },
+    "/review": {
+      "description": "Review a pull request",
+      "skill": "gmacko-dev-pr-review"
+    },
+    "/qa": {
+      "description": "Run QA verification for a feature",
+      "skill": "gmacko-qa-verify"
+    },
+    "/release": {
+      "description": "Prepare a release",
+      "skill": "gmacko-release-prepare"
+    },
+    "/deploy-web": {
+      "description": "Deploy to Vercel",
+      "skill": "gmacko-release-deploy-web"
+    },
+    "/deploy-mobile": {
+      "description": "Build and deploy mobile via EAS",
+      "skill": "gmacko-release-deploy-mobile"
+    },
+    "/close-release": {
+      "description": "Close a release and finalize documentation",
+      "skill": "gmacko-release-close"
+    }
+  },
+
+  "mcp": {
+    "servers": {}
+  }
+}

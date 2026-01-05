@@ -2,6 +2,42 @@
 
 All notable changes to the skill system are documented here.
 
+## [1.1.0] - 2025-01-05
+
+### Added
+
+#### Phase 3: QA Skills
+- `gmacko-qa-verify` - Systematic QA verification with documented results
+
+#### Phase 4: Release Skills
+- `gmacko-release-prepare` - Generate changelog, release notes, verify environments
+- `gmacko-release-deploy-web` - Vercel deployment with verification and rollback
+- `gmacko-release-deploy-mobile` - EAS build and store submission workflow
+- `gmacko-release-close` - Close issues, create GitHub release, archive docs
+
+#### Configuration
+- `opencode.json` - Skill permissions matrix and custom commands
+- `.opencode/agent/scaffolder.md` - Project initialization agent
+- `.opencode/agent/developer.md` - Feature development agent
+- `.opencode/agent/triage.md` - Issue management agent
+- `.opencode/agent/qa.md` - QA verification agent
+- `.opencode/agent/release.md` - Release management agent
+
+#### Commands
+- `/init` - Start project initialization workflow
+- `/interview` - Run project interview
+- `/plan` - Generate implementation plan
+- `/feature` - Plan a new feature
+- `/issue` - Create a GitHub issue
+- `/review` - Review a pull request
+- `/qa` - Run QA verification
+- `/release` - Prepare a release
+- `/deploy-web` - Deploy to Vercel
+- `/deploy-mobile` - Deploy via EAS
+- `/close-release` - Finalize release
+
+---
+
 ## [1.0.0] - 2025-01-05
 
 ### Added
@@ -55,4 +91,5 @@ Skills version alongside the template. Format: `MAJOR.MINOR.PATCH`
 
 | Skills Version | Template Version | Notes |
 |----------------|------------------|-------|
+| 1.1.0 | 1.0.0 | Added QA, Release skills, and agent configs |
 | 1.0.0 | 1.0.0 | Initial release |

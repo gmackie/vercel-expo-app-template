@@ -106,49 +106,78 @@ Available AI agent skills for Gmacko Ventures projects.
 
 ---
 
-## Phase 3: Quality Assurance (Planned)
+## Phase 3: Quality Assurance
 
 ### gmacko-qa-verify
-**Status**: Planned
+**Purpose**: Systematically verify feature completion against acceptance criteria and produce QA handoff document.
 
-**Purpose**: Verify feature completion against acceptance criteria and test plans.
+**Use when**:
+- Feature implementation is complete
+- PR is ready for QA review
+- Before promoting to staging/production
+
+**Permission**: `allow`
+
+**Requires**: Feature plan, dev handoff
+**Produces**: `docs/ai/handoffs/{feature}-qa.md`, test results summary
 
 ---
 
-### gmacko-qa-regression
-**Status**: Planned
-
-**Purpose**: Run regression testing checklist for releases.
-
----
-
-## Phase 4: Release Management (Planned)
+## Phase 4: Release Management
 
 ### gmacko-release-prepare
-**Status**: Planned
+**Purpose**: Prepare release artifacts including changelog, release notes, and environment verification.
 
-**Purpose**: Prepare release notes, verify environment readiness.
+**Use when**:
+- QA verification is complete
+- Ready to deploy to staging or production
+- Cutting a new version
+
+**Permission**: `allow`
+
+**Produces**: Release summary, changelog updates, release notes
 
 ---
 
 ### gmacko-release-deploy-web
-**Status**: Planned
+**Purpose**: Deploy the Next.js web application to Vercel with proper verification and rollback planning.
 
-**Purpose**: Manage Vercel deployment workflow.
+**Use when**:
+- Release preparation is complete
+- Ready to deploy to staging or production
+- Need to verify or rollback a deployment
+
+**Permission**: `ask` (production side effect)
+
+**Produces**: Deployment URL, updated release record
 
 ---
 
 ### gmacko-release-deploy-mobile
-**Status**: Planned
+**Purpose**: Build and submit mobile applications using Expo Application Services (EAS).
 
-**Purpose**: Manage EAS build and submission workflow.
+**Use when**:
+- Web deployment is complete (or mobile-only release)
+- Ready to build for TestFlight/Play Store testing
+- Ready to submit to app stores
+
+**Permission**: `ask` (external side effect)
+
+**Produces**: Build IDs, store submission status
 
 ---
 
 ### gmacko-release-close
-**Status**: Planned
+**Purpose**: Finalize release by closing issues, creating GitHub release, and archiving documentation.
 
-**Purpose**: Close issues, annotate PRs, write release record.
+**Use when**:
+- Deployment is complete and verified
+- Ready to close related issues
+- Creating GitHub release with changelog
+
+**Permission**: `ask` (external side effects)
+
+**Produces**: GitHub release, closed issues, final documentation
 
 ---
 
@@ -172,8 +201,41 @@ Skills are stored in `.opencode/skill/{name}/SKILL.md`.
 ├── gmacko-init-orchestrator/SKILL.md
 ├── gmacko-dev-feature-plan/SKILL.md
 ├── gmacko-dev-issue-create/SKILL.md
-└── gmacko-dev-pr-review/SKILL.md
+├── gmacko-dev-pr-review/SKILL.md
+├── gmacko-qa-verify/SKILL.md
+├── gmacko-release-prepare/SKILL.md
+├── gmacko-release-deploy-web/SKILL.md
+├── gmacko-release-deploy-mobile/SKILL.md
+└── gmacko-release-close/SKILL.md
 ```
+
+## Specialized Agents
+
+Agents are stored in `.opencode/agent/{name}.md`.
+
+| Agent | Purpose | Key Skills |
+|-------|---------|------------|
+| `scaffolder` | Project initialization | init-* skills |
+| `developer` | Feature implementation | dev-* skills |
+| `triage` | Issue management | dev-issue-create, dev-feature-plan |
+| `qa` | Quality assurance | qa-verify, dev-pr-review |
+| `release` | Deployment management | release-* skills |
+
+## Commands (via opencode.json)
+
+| Command | Description | Skill |
+|---------|-------------|-------|
+| `/init` | Start project initialization | gmacko-init-orchestrator |
+| `/interview` | Run project interview | gmacko-init-interview |
+| `/plan` | Generate implementation plan | gmacko-init-plan |
+| `/feature` | Plan a new feature | gmacko-dev-feature-plan |
+| `/issue` | Create a GitHub issue | gmacko-dev-issue-create |
+| `/review` | Review a pull request | gmacko-dev-pr-review |
+| `/qa` | Run QA verification | gmacko-qa-verify |
+| `/release` | Prepare a release | gmacko-release-prepare |
+| `/deploy-web` | Deploy to Vercel | gmacko-release-deploy-web |
+| `/deploy-mobile` | Deploy via EAS | gmacko-release-deploy-mobile |
+| `/close-release` | Finalize release | gmacko-release-close |
 
 ## Adding New Skills
 
