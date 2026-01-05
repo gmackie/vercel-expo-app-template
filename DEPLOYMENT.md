@@ -1,43 +1,39 @@
 # Deployment Guide
 
-This template supports multiple deployment strategies for both web and mobile apps.
+## Overview
 
-## Web Deployment
+| Trigger | Web Deploy | Mobile Build | Backend |
+|---------|------------|--------------|---------|
+| PR / feature branch | Vercel preview | - | - |
+| `staging` branch | Vercel preview | EAS staging | staging |
+| `main` branch | Vercel production | - | production |
+| Tag `v*` | Vercel production | EAS production + submit | production |
 
-### Vercel (Primary)
-
-Vercel deployments use the `*.apps.gmac.io` domain pattern:
-
-| Environment | URL Pattern | Trigger |
-|-------------|-------------|---------|
-| Production | `<project>.apps.gmac.io` | Push to main/master |
-| Preview | Auto-generated Vercel URL | Pull request |
-
-#### Quick Setup
-
-1. Create project in Vercel dashboard (or use CLI)
-2. Link to GitHub repository
-3. Set Root Directory to repository root (uses `vercel.json` config)
-4. Add custom domain: `<project>.apps.gmac.io`
-5. Configure environment variables
-
-#### CLI Setup
+## Quick Start
 
 ```bash
-# Install Vercel CLI
-pnpm add -g vercel
-
-# Login and link project
-vercel login
-vercel link
-
-# Deploy
-vercel --prod
+pnpm install
+./scripts/dev-mobile.sh              # Local dev with ngrok
+./scripts/dev-mobile.sh --staging    # Use staging backend
+./scripts/dev-mobile.sh --production # Use production backend
 ```
 
-#### Required Environment Variables
+## Vercel Setup
 
-Set these in Vercel dashboard or via CLI:
+### Project Configuration
+
+1. Go to https://vercel.com → Import Project
+2. Select this repository
+3. Configure:
+   - **Root Directory**: `apps/web`
+   - **Framework**: Next.js (auto-detect)
+   - **Node.js Version**: 20.x
+4. Set environment variables (see below)
+5. Add domains:
+   - Production: `<project>.apps.gmac.io`
+   - Preview: auto-generated
+
+### Environment Variables
 
 ```
 DATABASE_URL
@@ -54,174 +50,126 @@ SENTRY_ORG
 SENTRY_PROJECT
 ```
 
-#### GitHub Actions Secrets (for CI deployment)
+### Build Commands (auto-detected from vercel.json)
 
 ```
-VERCEL_TOKEN          # From vercel.com/account/tokens
-VERCEL_ORG_ID         # From .vercel/project.json after linking
-VERCEL_PROJECT_ID     # From .vercel/project.json after linking
+Install: cd ../.. && pnpm install
+Build:   cd ../.. && pnpm turbo build --filter=@repo/web
 ```
 
-### Docker + Kubernetes (Alternative)
+## Mobile (EAS) Setup
 
-For self-hosted deployments on the gmac.io k8s cluster.
-
-| Environment | URL | Trigger |
-|-------------|-----|---------|
-| Production | `<project>.gmac.io` | Tagged release (v*) |
-
-#### GitHub Secrets Required
-
-```
-REGISTRY_USERNAME      # Docker registry username
-REGISTRY_PASSWORD      # Docker registry password  
-KUBECONFIG            # Base64-encoded kubeconfig
-```
-
-#### Manual Docker Build
-
-```bash
-docker build -t registry.gmac.io/myapp/web:latest -f apps/web/Dockerfile .
-docker login registry.gmac.io -u admin -p Admin123!
-docker push registry.gmac.io/myapp/web:latest
-```
-
-#### Manual Kubernetes Deployment
-
-```bash
-export NAMESPACE=myapp
-export IMAGE_TAG=latest
-export REGISTRY=registry.gmac.io
-export IMAGE_NAME=myapp/web
-
-envsubst < k8s/namespace.yaml | kubectl apply -f -
-envsubst < k8s/secrets.yaml | kubectl apply -f -
-envsubst < k8s/production.yaml | kubectl apply -f -
-```
-
-## Mobile Deployment
-
-### Development Environments
-
-| Mode | Command | Description |
-|------|---------|-------------|
-| Local | `pnpm dev:mobile` | ngrok tunnel to local Next.js |
-| Beta | `pnpm dev:mobile --beta` | Connect to beta.<project>.apps.gmac.io |
-| Custom | `pnpm dev:mobile --beta https://api.example.com` | Any remote API |
-
-### Build Profiles
+### Profiles
 
 | Profile | Bundle ID | Distribution | Use Case |
 |---------|-----------|--------------|----------|
-| development | `*.dev` | Internal | Dev client with hot reload |
-| preview | `*.dev` | Internal | Testing builds |
+| development | `*.dev` | Internal | Dev client |
+| staging | `*.staging` | Internal | TestFlight/beta testing |
 | production | Base ID | App Store | Production release |
 
-### EAS Builds
+### Build Commands
 
 ```bash
 # Development client
 eas build --profile development --platform ios
 
-# Preview build (beta testing)
-eas build --profile preview --platform all
+# Staging (auto on staging branch push)
+eas build --profile staging --platform all
 
-# Production build
-eas build --profile production --platform all
-
-# Build and auto-submit to stores
+# Production (auto on v* tag)
 eas build --profile production --auto-submit --platform all
 ```
 
-### CI/CD Mobile Builds
+### EAS Secrets
 
-The GitHub workflow automatically:
-- Builds preview for iOS/Android on push to main
-- Builds and submits production on tagged releases (v*)
+Set in Expo dashboard or via CLI:
+```bash
+eas secret:create --name EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY --value pk_xxx
+```
 
-Required secret: `EXPO_TOKEN`
+### App Store Setup
+
+**iOS** - Update `apps/mobile/eas.json`:
+```json
+"submit": {
+  "production": {
+    "ios": {
+      "appleId": "your-apple-id@example.com",
+      "ascAppId": "your-app-store-connect-id",
+      "appleTeamId": "YOUR_TEAM_ID"
+    }
+  }
+}
+```
+
+**Android** - Add `apps/mobile/play-store-credentials.json`
+
+## GitHub Actions Secrets
+
+```
+EXPO_TOKEN              # From expo.dev
+DATABASE_URL            # For CI builds
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+CLERK_SECRET_KEY
+```
+
+## Local Development
+
+### With ngrok (local API)
+
+```bash
+./scripts/dev-mobile.sh
+```
+
+This:
+1. Starts Next.js on localhost
+2. Creates ngrok tunnel
+3. Launches Expo with tunnel URL
+
+### With Remote Backend
+
+```bash
+./scripts/dev-mobile.sh --staging     # beta.<project>.apps.gmac.io
+./scripts/dev-mobile.sh --production  # <project>.apps.gmac.io
+```
+
+### Backend Toggle in App
+
+The app exposes backend URLs in `Constants.expoConfig.extra`:
+
+```js
+import Constants from 'expo-constants';
+
+const { backendUrl, backendUrlStaging, backendUrlProd } = Constants.expoConfig.extra;
+
+// Allow testers to toggle
+const [useProd, setUseProd] = useState(false);
+const apiUrl = useProd ? backendUrlProd : backendUrlStaging;
+```
+
+## Branch Workflow
+
+```
+feature/* → PR → staging → main → v1.0.0
+              ↓          ↓        ↓
+           Preview    Prod     Prod + Submit
+           EAS stg    -        EAS prod
+```
+
+## Visual Distinction
+
+Staging builds use different:
+- App name: "My App Staging"
+- Bundle ID: `com.example.myapp.staging`
+- Icon: `assets/icon-staging.png` (create this)
+- URL scheme: `myapp-staging://`
+
+## Health Check
+
+`GET /api/health` → `{"status": "healthy", "timestamp": "..."}`
 
 ## Demo Deployment
 
-This template is deployed as a demo at:
-
+This template is deployed at:
 - **Production**: https://demo.apps.gmac.io
-- **Vercel Project**: `demo`
-
-### Setting Up a New Demo
-
-1. Fork/clone this repository
-2. Create Vercel project named `demo`:
-   ```bash
-   vercel link --project demo
-   ```
-3. Add domain `demo.apps.gmac.io` in Vercel dashboard
-4. Configure DNS: CNAME `demo.apps.gmac.io` → `cname.vercel-dns.com`
-5. Set environment variables in Vercel
-6. Push to trigger deployment
-
-## Environment Configuration
-
-### Web (`apps/web/.env.local`)
-
-```bash
-DATABASE_URL=postgresql://...
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_...
-CLERK_SECRET_KEY=sk_...
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_...
-STRIPE_SECRET_KEY=sk_...
-STRIPE_WEBHOOK_SECRET=whsec_...
-NEXT_PUBLIC_POSTHOG_KEY=phc_...
-NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
-NEXT_PUBLIC_SENTRY_DSN=https://...
-SENTRY_AUTH_TOKEN=sntrys_...
-SENTRY_ORG=your-org
-SENTRY_PROJECT=your-project
-```
-
-### Mobile (`apps/mobile/.env`)
-
-```bash
-EXPO_PUBLIC_API_URL=https://demo.apps.gmac.io
-EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_...
-EXPO_PUBLIC_POSTHOG_KEY=phc_...
-EXPO_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
-EXPO_PUBLIC_SENTRY_DSN=https://...
-```
-
-## Release Process
-
-### Web Release
-
-Push to main/master triggers automatic Vercel deployment.
-
-For k8s deployment (optional):
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
-
-### Mobile Release
-
-```bash
-cd apps/mobile
-eas build --profile production --auto-submit --platform all
-```
-
-## Monitoring
-
-### Health Check
-
-`GET /api/health` returns:
-```json
-{"status": "healthy", "timestamp": "2025-01-05T..."}
-```
-
-### Logs
-
-Vercel: Dashboard → Project → Deployments → Functions tab
-
-Kubernetes:
-```bash
-kubectl -n myapp logs -l app=web -f
-```
+- **Staging**: https://beta.demo.apps.gmac.io

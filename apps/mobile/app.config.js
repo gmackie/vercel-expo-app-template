@@ -1,43 +1,63 @@
-const IS_DEV = process.env.APP_VARIANT === "development";
+const APP_VARIANT = process.env.APP_VARIANT ?? "production";
+const IS_DEV = APP_VARIANT === "development";
+const IS_STAGING = APP_VARIANT === "staging";
+const IS_PROD = APP_VARIANT === "production";
 
-// =============================================================================
-// App Configuration
-// =============================================================================
-// This template supports three environments:
-//
-// 1. Local Development (Expo Go or dev client)
-//    - Uses ngrok tunnel for API access
-//    - Run with: pnpm dev:mobile (from root) or ./scripts/dev-mobile.sh
-//
-// 2. Beta/Internal (EAS Development build)
-//    - Uses internal distribution with ad-hoc signing
-//    - Separate bundle ID (*.dev) for side-by-side install
-//    - Build with: eas build --profile development --platform ios
-//
-// 3. Production (EAS Production build)
-//    - For App Store / Play Store submission
-//    - Build with: eas build --profile production --platform all
-// =============================================================================
-
-// =============================================================================
 // TODO: Update these values for your app after running ./scripts/setup.sh
-// =============================================================================
 const APP_NAME = "My App";
 const APP_SLUG = "my-app";
-const BUNDLE_ID_BASE = "com.example.myapp"; // e.g., "com.yourcompany.yourapp"
-const PROJECT_ID = "your-eas-project-id"; // Run: eas init
-const OWNER = "your-expo-username"; // Your Expo username
+const BUNDLE_ID_BASE = "com.example.myapp";
+const PROJECT_ID = "your-eas-project-id";
+const OWNER = "your-expo-username";
+
+// Backend URL resolution (priority order):
+// 1. EXPO_PUBLIC_API_URL (ngrok tunnel for local dev)
+// 2. EXPO_PUBLIC_BACKEND_URL (set in eas.json per profile)
+// 3. Fallback based on variant
+const getBackendUrl = () => {
+  if (process.env.EXPO_PUBLIC_API_URL) return process.env.EXPO_PUBLIC_API_URL;
+  if (process.env.EXPO_PUBLIC_BACKEND_URL) return process.env.EXPO_PUBLIC_BACKEND_URL;
+  if (IS_STAGING) return "https://beta.demo.apps.gmac.io";
+  if (IS_PROD) return "https://demo.apps.gmac.io";
+  return "http://localhost:3000";
+};
+
+// Bundle ID varies by environment for side-by-side installs
+const getBundleId = () => {
+  if (IS_DEV) return `${BUNDLE_ID_BASE}.dev`;
+  if (IS_STAGING) return `${BUNDLE_ID_BASE}.staging`;
+  return BUNDLE_ID_BASE;
+};
+
+// App name shows environment in non-prod builds
+const getAppName = () => {
+  if (IS_DEV) return `${APP_NAME} Dev`;
+  if (IS_STAGING) return `${APP_NAME} Staging`;
+  return APP_NAME;
+};
+
+// URL scheme for deep linking
+const getScheme = () => {
+  if (IS_DEV) return `${APP_SLUG}-dev`;
+  if (IS_STAGING) return `${APP_SLUG}-staging`;
+  return APP_SLUG;
+};
+
+// Icon per environment (create assets/icon-staging.png for visual distinction)
+const getIcon = () => {
+  if (IS_STAGING) return "./assets/icon-staging.png";
+  return "./assets/icon.png";
+};
 
 export default {
   expo: {
-    // App name - shows as "AppName-Dev" for development builds
-    name: IS_DEV ? `${APP_NAME} Dev` : APP_NAME,
+    name: getAppName(),
     slug: APP_SLUG,
     version: "1.0.0",
     orientation: "portrait",
-    icon: "./assets/icon.png",
+    icon: getIcon(),
     userInterfaceStyle: "automatic",
-    scheme: IS_DEV ? `${APP_SLUG}-dev` : APP_SLUG,
+    scheme: getScheme(),
     newArchEnabled: true,
 
     splash: {
@@ -50,7 +70,7 @@ export default {
 
     ios: {
       supportsTablet: true,
-      bundleIdentifier: IS_DEV ? `${BUNDLE_ID_BASE}.dev` : BUNDLE_ID_BASE,
+      bundleIdentifier: getBundleId(),
       buildNumber: "1",
       associatedDomains: [
         `applinks:${process.env.EXPO_PUBLIC_APP_DOMAIN ?? "example.com"}`,
@@ -67,7 +87,7 @@ export default {
         foregroundImage: "./assets/adaptive-icon.png",
         backgroundColor: "#ffffff",
       },
-      package: IS_DEV ? `${BUNDLE_ID_BASE}.dev` : BUNDLE_ID_BASE,
+      package: getBundleId(),
       versionCode: 1,
       intentFilters: [
         {
@@ -119,13 +139,14 @@ export default {
       eas: {
         projectId: PROJECT_ID,
       },
-      // Environment indicator for debugging
-      appVariant: process.env.APP_VARIANT ?? "production",
+      appVariant: APP_VARIANT,
+      backendUrl: getBackendUrl(),
+      backendUrlStaging: "https://beta.demo.apps.gmac.io",
+      backendUrlProd: "https://demo.apps.gmac.io",
     },
 
     owner: OWNER,
 
-    // EAS Update configuration
     runtimeVersion: {
       policy: "appVersion",
     },

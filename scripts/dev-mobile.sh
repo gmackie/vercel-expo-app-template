@@ -20,8 +20,9 @@ SAFE_NAME=$(echo "$APP_NAME" | sed 's/@//g' | sed 's/\//-/g')
 NGROK_DOMAIN=""
 USE_EXPO_GO=false
 BUILD_DEV_CLIENT=false
-USE_BETA=false
-BETA_URL=""
+USE_STAGING=false
+USE_PRODUCTION=false
+CUSTOM_URL=""
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -37,10 +38,19 @@ while [[ $# -gt 0 ]]; do
             BUILD_DEV_CLIENT=true
             shift
             ;;
-        --beta)
-            USE_BETA=true
+        --staging)
+            USE_STAGING=true
             if [[ -n "$2" && ! "$2" =~ ^-- ]]; then
-                BETA_URL="$2"
+                CUSTOM_URL="$2"
+                shift 2
+            else
+                shift
+            fi
+            ;;
+        --production|--prod)
+            USE_PRODUCTION=true
+            if [[ -n "$2" && ! "$2" =~ ^-- ]]; then
+                CUSTOM_URL="$2"
                 shift 2
             else
                 shift
@@ -53,17 +63,18 @@ while [[ $# -gt 0 ]]; do
             echo "Usage: ./scripts/dev-mobile.sh [options]"
             echo ""
             echo "Options:"
-            echo "  --beta [URL]      Use beta environment (default: beta.\${project}.gmac.io)"
-            echo "                    Skips local Next.js and ngrok, connects to remote API"
+            echo "  --staging [URL]   Use staging backend (default: beta.<project>.apps.gmac.io)"
+            echo "  --production [URL] Use production backend (default: <project>.apps.gmac.io)"
             echo "  --domain NAME     Use a static ngrok domain (NAME.ngrok.app)"
             echo "  --expo-go         Use Expo Go (limited native modules)"
             echo "  --dev-client      Build development client first"
             echo "  --help, -h        Show this help"
             echo ""
             echo "Examples:"
-            echo "  ./scripts/dev-mobile.sh                    # Local dev with ngrok tunnel"
-            echo "  ./scripts/dev-mobile.sh --beta             # Connect to beta.myapp.gmac.io"
-            echo "  ./scripts/dev-mobile.sh --beta https://custom.api.com"
+            echo "  ./scripts/dev-mobile.sh                        # Local dev with ngrok"
+            echo "  ./scripts/dev-mobile.sh --staging              # Connect to staging API"
+            echo "  ./scripts/dev-mobile.sh --production           # Connect to production API"
+            echo "  ./scripts/dev-mobile.sh --staging https://my.api.com  # Custom staging URL"
             echo ""
             exit 0
             ;;
@@ -81,25 +92,36 @@ echo "Mobile Development Environment"
 echo "==============================="
 echo ""
 
-if [[ "$USE_BETA" == true ]]; then
-    if [[ -z "$BETA_URL" ]]; then
-        PROJECT_NAME=$(echo "$SAFE_NAME" | sed 's/-app$//' | sed 's/vercel-//')
-        BETA_URL="https://beta.${PROJECT_NAME}.gmac.io"
-    fi
+if [[ "$USE_STAGING" == true || "$USE_PRODUCTION" == true ]]; then
+    PROJECT_NAME=$(echo "$SAFE_NAME" | sed 's/-app$//' | sed 's/vercel-//')
     
-    step "Using beta environment: ${BETA_URL}"
-    
-    if ! curl -s --head --connect-timeout 5 "${BETA_URL}/api/health" >/dev/null 2>&1; then
-        warn "Beta API may not be reachable. Continuing anyway..."
+    if [[ "$USE_STAGING" == true ]]; then
+        if [[ -n "$CUSTOM_URL" ]]; then
+            API_URL="$CUSTOM_URL"
+        else
+            API_URL="https://beta.${PROJECT_NAME}.apps.gmac.io"
+        fi
+        APP_VARIANT="staging"
+        step "Using staging environment: ${API_URL}"
     else
-        success "Beta API is reachable"
+        if [[ -n "$CUSTOM_URL" ]]; then
+            API_URL="$CUSTOM_URL"
+        else
+            API_URL="https://${PROJECT_NAME}.apps.gmac.io"
+        fi
+        APP_VARIANT="production"
+        step "Using production environment: ${API_URL}"
     fi
     
-    API_URL="$BETA_URL"
+    if ! curl -s --head --connect-timeout 5 "${API_URL}/api/health" >/dev/null 2>&1; then
+        warn "API may not be reachable. Continuing anyway..."
+    else
+        success "API is reachable"
+    fi
     
     echo ""
     echo "---"
-    echo -e "${GREEN}Beta environment ready!${NC}"
+    echo -e "${GREEN}Environment ready!${NC}"
     echo "---"
     echo ""
     echo -e "${BLUE}API:${NC}   ${API_URL}"
@@ -107,6 +129,7 @@ if [[ "$USE_BETA" == true ]]; then
     echo ""
     
     step "Starting Expo..."
+    echo -e "APP_VARIANT=${APP_VARIANT}"
     echo -e "EXPO_PUBLIC_API_URL=${API_URL}"
     echo ""
     
@@ -121,9 +144,9 @@ if [[ "$USE_BETA" == true ]]; then
     
     cd apps/mobile
     if [[ "$USE_EXPO_GO" == true ]]; then
-        EXPO_PUBLIC_API_URL="$API_URL" npx expo start --tunnel --go
+        APP_VARIANT="$APP_VARIANT" EXPO_PUBLIC_API_URL="$API_URL" npx expo start --tunnel --go
     else
-        EXPO_PUBLIC_API_URL="$API_URL" npx expo start --tunnel
+        APP_VARIANT="$APP_VARIANT" EXPO_PUBLIC_API_URL="$API_URL" npx expo start --tunnel
     fi
     exit 0
 fi
@@ -188,8 +211,6 @@ fi
 step "Starting Next.js server..."
 > "$NEXT_LOG"
 
-WEB_FILTER=$(node -p "require('./package.json').name.replace(/^@/, '@').split('/')[0] + '/web'" 2>/dev/null || echo "web")
-
 pnpm --filter "*web*" dev > "$NEXT_LOG" 2>&1 &
 NEXT_PID=$!
 
@@ -251,6 +272,7 @@ echo -e "${BLUE}tRPC:${NC}         ${API_URL}/api/trpc"
 echo ""
 
 step "Starting Expo..."
+echo -e "APP_VARIANT=development"
 echo -e "EXPO_PUBLIC_API_URL=${API_URL}"
 echo ""
 
@@ -265,7 +287,7 @@ echo ""
 
 cd apps/mobile
 if [[ "$USE_EXPO_GO" == true ]]; then
-    EXPO_PUBLIC_API_URL="$API_URL" npx expo start --tunnel --go
+    APP_VARIANT=development EXPO_PUBLIC_API_URL="$API_URL" npx expo start --tunnel --go
 else
-    EXPO_PUBLIC_API_URL="$API_URL" npx expo start --tunnel
+    APP_VARIANT=development EXPO_PUBLIC_API_URL="$API_URL" npx expo start --dev-client --tunnel
 fi

@@ -35,11 +35,12 @@
       },
       "channel": "development"
     },
-    "preview": {
+    "staging": {
       "extends": "base",
       "distribution": "internal",
       "env": {
-        "APP_VARIANT": "development"
+        "APP_VARIANT": "staging",
+        "EXPO_PUBLIC_API_URL": "https://beta.demo.apps.gmac.io"
       },
       "ios": {
         "simulator": false
@@ -47,13 +48,14 @@
       "android": {
         "buildType": "apk"
       },
-      "channel": "preview"
+      "channel": "staging"
     },
     "production": {
       "extends": "base",
       "autoIncrement": true,
       "env": {
-        "APP_VARIANT": "production"
+        "APP_VARIANT": "production",
+        "EXPO_PUBLIC_API_URL": "https://demo.apps.gmac.io"
       },
       "channel": "production"
     }
