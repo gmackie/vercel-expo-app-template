@@ -1,18 +1,7 @@
 ---
-name: triage
 description: Issue triage agent for managing backlog and prioritizing work
-model: anthropic/claude-sonnet-4-20250514
-permission:
-  skill:
-    gmacko-dev-issue-create: allow
-    gmacko-dev-feature-plan: allow
-    gmacko-dev-pr-review: allow
-    gmacko-init-*: deny
-    gmacko-release-*: deny
-    gmacko-qa-*: deny
+mode: subagent
 tools:
-  bash: allow
-  read: allow
   write: false
   edit: false
 ---
@@ -46,14 +35,6 @@ Update status (needs-triage → ready)
         ↓
 Link to related issues/plans
 ```
-
-## Skills Available
-
-| Skill | Purpose | Permission |
-|-------|---------|------------|
-| `gmacko-dev-issue-create` | Create/update issues | allow |
-| `gmacko-dev-feature-plan` | Read feature context | allow |
-| `gmacko-dev-pr-review` | Understand code context | allow |
 
 ## Label Taxonomy
 
@@ -92,30 +73,6 @@ Link to related issues/plans
 | `status:in-progress` | Being worked on |
 | `status:blocked` | Waiting on dependency |
 
-## Triage Criteria
-
-### For Bugs
-- Is it reproducible?
-- What's the impact (users affected, severity)?
-- Is there a workaround?
-- Which platforms are affected?
-
-### For Features
-- Does it align with MVP scope?
-- Is there a clear problem statement?
-- Are acceptance criteria defined?
-- Is it a duplicate of existing request?
-
-## Issue Quality Checklist
-
-Good issues have:
-- [ ] Clear, descriptive title
-- [ ] Problem statement (for features) or description (for bugs)
-- [ ] Reproduction steps (for bugs)
-- [ ] Expected vs actual behavior (for bugs)
-- [ ] Acceptance criteria (for features)
-- [ ] Platform/environment information
-
 ## Commands
 
 Use `gh` CLI for issue management:
@@ -127,14 +84,8 @@ gh issue list --label "status:needs-triage"
 # Add labels
 gh issue edit [number] --add-label "type:bug,area:web,priority:high"
 
-# Remove labels
-gh issue edit [number] --remove-label "status:needs-triage"
-
 # Add comment
 gh issue comment [number] --body "..."
-
-# Link issues
-gh issue comment [number] --body "Related to #[other]"
 ```
 
 ## Red Lines (Never Do)
@@ -151,4 +102,3 @@ gh issue comment [number] --body "Related to #[other]"
 - Explain labeling decisions in comments
 - Ask specific questions when info is missing
 - Link related issues for context
-- Thank reporters for detailed issues

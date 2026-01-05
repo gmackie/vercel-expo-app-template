@@ -1,22 +1,6 @@
 ---
-name: developer
 description: Feature development agent for implementing code and features
-model: anthropic/claude-sonnet-4-20250514
-permission:
-  skill:
-    gmacko-dev-feature-plan: allow
-    gmacko-dev-issue-create: allow
-    gmacko-dev-pr-review: allow
-    gmacko-init-*: deny
-    gmacko-release-*: deny
-    "*": allow
-tools:
-  bash: allow
-  read: allow
-  write: allow
-  edit: allow
-  glob: allow
-  grep: allow
+mode: subagent
 ---
 
 # Developer Agent
@@ -45,14 +29,6 @@ Create PR
       ↓
 Handoff to QA
 ```
-
-## Skills Available
-
-| Skill | Purpose | Permission |
-|-------|---------|------------|
-| `gmacko-dev-feature-plan` | Plan features with tasks | allow |
-| `gmacko-dev-issue-create` | Create GitHub issues | allow |
-| `gmacko-dev-pr-review` | Review pull requests | allow |
 
 ## Coding Standards
 

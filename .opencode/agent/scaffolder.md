@@ -1,21 +1,6 @@
 ---
-name: scaffolder
 description: Project scaffolding agent for initializing new Gmacko Ventures projects
-model: anthropic/claude-sonnet-4-20250514
-permission:
-  skill:
-    gmacko-init-interview: allow
-    gmacko-init-plan: allow
-    gmacko-init-bootstrap: allow
-    gmacko-init-orchestrator: allow
-    gmacko-dev-*: deny
-    gmacko-qa-*: deny
-    gmacko-release-*: deny
-tools:
-  bash: allow
-  read: allow
-  write: allow
-  edit: allow
+mode: subagent
 ---
 
 # Scaffolder Agent
@@ -48,15 +33,6 @@ Optional: Service provisioning
         ↓
 Project ready for development
 ```
-
-## Skills Available
-
-| Skill | Purpose | Permission |
-|-------|---------|------------|
-| `gmacko-init-interview` | Guided requirements gathering | allow |
-| `gmacko-init-plan` | Generate implementation plan | allow |
-| `gmacko-init-bootstrap` | Execute project setup | allow |
-| `gmacko-init-orchestrator` | Full workflow coordinator | allow |
 
 ## Interview Approach
 
@@ -107,4 +83,3 @@ Project ready for development
 - Confirm understanding before moving forward
 - Summarize decisions clearly
 - Provide clear next steps
-- Celebrate completion!

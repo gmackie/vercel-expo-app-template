@@ -1,0 +1,89 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "AGENTS.md",
+    "CLAUDE.md",
+    "docs/ai/SKILL_SYSTEM_DESIGN.md"
+  ],
+  "permission": {
+    "edit": "allow",
+    "bash": "allow"
+  },
+  "agent": {
+    "build": {
+      "description": "Default development agent for implementing features"
+    },
+    "plan": {
+      "description": "Planning agent for feature breakdown and architecture",
+      "tools": {
+        "write": false,
+        "edit": false
+      }
+    },
+    "qa": {
+      "description": "QA verification agent for testing and validation",
+      "mode": "subagent",
+      "tools": {
+        "write": false,
+        "edit": false
+      }
+    },
+    "release": {
+      "description": "Release management agent for deployments",
+      "mode": "subagent",
+      "permission": {
+        "bash": "ask"
+      }
+    },
+    "scaffolder": {
+      "description": "Project scaffolding agent for initializing new projects",
+      "mode": "subagent"
+    },
+    "triage": {
+      "description": "Issue triage agent for managing backlog and prioritizing work",
+      "mode": "subagent",
+      "tools": {
+        "write": false,
+        "edit": false
+      }
+    }
+  },
+  "command": {
+    "init": {
+      "description": "Start project initialization workflow",
+      "template": "Use the gmacko-init-orchestrator skill to start the full project initialization workflow. Guide me through the interview process."
+    },
+    "interview": {
+      "description": "Run project interview to generate manifest",
+      "template": "Use the gmacko-init-interview skill to conduct a project interview and generate PROJECT_MANIFEST.json."
+    },
+    "feature": {
+      "description": "Plan a new feature with task breakdown",
+      "template": "Use the gmacko-dev-feature-plan skill to plan this feature: $ARGUMENTS"
+    },
+    "issue": {
+      "description": "Create a GitHub issue",
+      "template": "Use the gmacko-dev-issue-create skill to create a GitHub issue for: $ARGUMENTS"
+    },
+    "review": {
+      "description": "Review a pull request",
+      "template": "Use the gmacko-dev-pr-review skill to review PR $ARGUMENTS"
+    },
+    "qa": {
+      "description": "Run QA verification for a feature",
+      "template": "Use the gmacko-qa-verify skill to verify: $ARGUMENTS"
+    },
+    "release": {
+      "description": "Prepare a release",
+      "template": "Use the gmacko-release-prepare skill to prepare a release."
+    },
+    "deploy-web": {
+      "description": "Deploy to Vercel",
+      "template": "Use the gmacko-release-deploy-web skill to deploy to Vercel. Target environment: $ARGUMENTS"
+    },
+    "deploy-mobile": {
+      "description": "Build and deploy mobile via EAS",
+      "template": "Use the gmacko-release-deploy-mobile skill to build and deploy mobile apps."
+    }
+  }
+}
