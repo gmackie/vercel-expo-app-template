@@ -131,6 +131,16 @@ See `.github/ISSUE_TEMPLATE/` for the full label taxonomy.
 ### Skill not found
 Ensure skills are in `.opencode/skill/{name}/SKILL.md`
 
+**Important**: Skills are discovered at OpenCode session start. If you add new skills:
+1. Exit the current OpenCode session
+2. Start a new session from the project root
+3. Run `find_skills` to verify discovery
+
+If skills still don't appear:
+- Verify frontmatter has `name:` and `description:` fields
+- Ensure `name` matches the directory name exactly
+- Check that `name` follows lowercase-with-hyphens convention
+
 ### Manifest validation fails
 Check `PROJECT_MANIFEST.json` against the schema in examples
 
